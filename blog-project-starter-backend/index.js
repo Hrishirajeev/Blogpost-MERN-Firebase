@@ -1,4 +1,6 @@
+
 require("dotenv").config();
+
 var express = require("express");
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
@@ -7,8 +9,8 @@ var cors = require("cors");
 var adminApp = require("firebase-admin/app");
 var adminAuth = require("firebase-admin/auth");
 
-// Firebase Admin setup
-var serviceAccount = require("./blogportfolio-90fd7-firebase-adminsdk-fbsvc-84d5462b78.json");
+// Firebase Admin setup for Render
+var serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 adminApp.initializeApp({
   credential: adminApp.cert(serviceAccount)
@@ -19,7 +21,6 @@ var app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Admin Google email
 var adminEmail = "hrishirajeev24@gmail.com";
 
 // MongoDB connection
@@ -71,7 +72,7 @@ function verifyAdmin(req, res, next) {
   next();
 }
 
-// Get blogs - everyone
+// Get all blogs
 app.get("/api/blogs", function (req, res) {
   Blog.find({})
     .then(function (blogs) {
@@ -82,7 +83,7 @@ app.get("/api/blogs", function (req, res) {
     });
 });
 
-// Like blogs - everyone
+// Like a blog
 app.patch("/api/blogs/like/:id", function (req, res) {
   Blog.findByIdAndUpdate(
     req.params.id,
@@ -93,6 +94,7 @@ app.patch("/api/blogs/like/:id", function (req, res) {
       if (!blog) {
         return res.status(404).json({ message: "Blog not found" });
       }
+
       res.json(blog);
     })
     .catch(function (error) {
@@ -132,6 +134,7 @@ app.put("/api/blogs/:id", verifyUser, verifyAdmin, function (req, res) {
       if (!blog) {
         return res.status(404).json({ message: "Blog not found" });
       }
+
       res.json(blog);
     })
     .catch(function (error) {
@@ -146,6 +149,7 @@ app.delete("/api/blogs/:id", verifyUser, verifyAdmin, function (req, res) {
       if (!blog) {
         return res.status(404).json({ message: "Blog not found" });
       }
+
       res.json({ message: "Blog deleted successfully" });
     })
     .catch(function (error) {
@@ -154,6 +158,8 @@ app.delete("/api/blogs/:id", verifyUser, verifyAdmin, function (req, res) {
 });
 
 // Start server
-app.listen(5000, function () {
-  console.log("Server running on port 5000");
+var PORT = process.env.PORT || 5000;
+
+app.listen(PORT, function () {
+  console.log("Server running on port " + PORT);
 });
