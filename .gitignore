@@ -1,0 +1,10 @@
+
+node_modules/
+.env
+.env.*
+!.env.example
+build/
+dist/
+*.log
+
+blog-project-starter-backend/blogportfolio-90fd7-firebase-adminsdk-fbsvc-84d5462b78.json
